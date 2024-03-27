@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOM Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .container {
+            margin: auto;
+            width: 80%;
+            padding: 10px;
+        }
+        .form-input {
+            margin: 10px 0;
+            padding: 10px;
+            width: calc(100% - 22px);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>BOM Data</h2>
+        <div id="addForm">
+            <input type="text" id="addPartName" class="form-input" placeholder="Part Name">
+            <input type="number" id="addQuantity" class="form-input" placeholder="Quantity">
+            <input type="text" id="addPrice" class="form-input" placeholder="Price">
+            <input type="text" id="addPurchaseLink" class="form-input" placeholder="Purchase Link">
+            <button onclick="addPart()">Add Part</button>
+        </div>
+        <table id="bomTable">
+            <thead>
+                <tr>
+                    <th>Part Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Purchase Link</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BOM data rows will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchBomData();
+        });
+
+        function fetchBomData() {
+            fetch('/api/bom')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('bomTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = ''; // Clear existing rows
+                    data.data.forEach((row, index) => {
+                        let tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${row.partName}</td>
+                                        <td>${row.quantity}</td>
+                                        <td>$${parseFloat(row.price).toFixed(2)}</td>
+                                        <td><a href="${row.purchaseLink}" target="_blank">Link</a></td>
+                                        <td><button onclick="deletePart('${row.partId}')">Delete</button></td>`;
+                        tableBody.appendChild(tr);
+                    });
+                })
+                .catch(error => console.error('Error fetching BOM data:', error));
+        }
+
+        function addPart() {
+            // Implementation similar to the given JavaScript snippet
+        }
+
+        function deletePart(partId) {
+            // Example DELETE operation
+            fetch(`/api/bom/${partId}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                fetchBomData(); // Refresh the table to reflect the deletion
+            })
+            .catch(error => console.error('Error deleting part:', error));
+        }
+
+        // Additional functions for updatePart(partId) will be similar
+    </script>
+</body>
+</html>
